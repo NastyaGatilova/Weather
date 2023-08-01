@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DataDetailActivity"
+    android:orientation="vertical"
+    android:background="#4598CFE8">
+
+
+    <TextView
+        android:id="@+id/cityDataD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:textSize="35dp"
+        android:textStyle = "bold"
+       />
+    <TextView
+        android:id="@+id/tempDataD"
+        android:textSize="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"/>
+
+    <ImageView
+        android:id="@+id/imageurlDataD"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+       />
+
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        android:id="@+id/loader"
+        android:layout_marginTop="60dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        app:cpv_indeterminate="true"
+        app:cpv_animAutostart="true"
+        app:cpv_color="@color/black"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+
+        android:id="@+id/rcViewDataD"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp" />
+
+
+</LinearLayout>
