@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Weather</string>
+    <string name="hint_choise_city">Введите город</string>
+    <string name="btn_choise_city">Добавить</string>
+    <string name="btn_plus_main">+</string>
 </resources>
