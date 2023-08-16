@@ -16,7 +16,8 @@ const val API_key="1bb93494997fe83bb6d678b29f57d199"
 
 val adapter= WeatherAdapter()
 val adapterDay= DayWeatherAdapter()
-var deleteCity = ""
+
+
 
 var isFirstOpen = 0
 open class MainActivity : AppCompatActivity() {
@@ -42,7 +43,6 @@ open class MainActivity : AppCompatActivity() {
         val swipeToDeleteCallback = SwipeToDeleteCallback(adapter)
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(act_main_rcView)
-
 
         myDbManager.readDbCurData()
 

@@ -36,10 +36,28 @@ class MyDbManager(context: Context) {
 
 
 
+    fun updateToDbCurData(weather: Weather){
+        val db = myDbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put(MyDbClass.COLUMN_NAME_CITY,  weather.city)
+            put(MyDbClass.COLUMN_NAME_TEMPER,  weather.temp)
+            put(MyDbClass.COLUMN_NAME_IMGURL, weather.imageurl)
+
+
+        }
+        db?.update(MyDbClass.TABLE_NAME, values, "${MyDbClass.COLUMN_NAME_CITY}=?", arrayOf(weather.city))
+
+
+    }
+
+
+
 
 
     @SuppressLint("Range")
     fun readDbCurData(){
+
+     //   db?.execSQL("UPDATE ${MyDbClass.TABLE_NAME} SET ${MyDbClass.COLUMN_NAME_TEMPER}= ${weather.temp}, ${MyDbClass.COLUMN_NAME_IMGURL}=${weather.imageurl}")
 
         val cursor = db?.rawQuery(
             "SELECT ${MyDbClass.COLUMN_NAME_CITY} , ${MyDbClass.COLUMN_NAME_TEMPER}, ${MyDbClass.COLUMN_NAME_IMGURL} FROM ${MyDbClass.TABLE_NAME}",
@@ -67,6 +85,7 @@ class MyDbManager(context: Context) {
 
 
         }
+
 
         cursor.close()
 

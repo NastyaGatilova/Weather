@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.weather.db.MyDbManager
 import com.github.rahatarmanahmed.cpv.CircularProgressView
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
@@ -27,7 +28,7 @@ import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.roundToInt
-val liveDataCur = MutableLiveData<String>()
+
 class DataDetailActivity : AppCompatActivity() {
 
    var rcViewDataD: RecyclerView? = null
@@ -35,6 +36,7 @@ class DataDetailActivity : AppCompatActivity() {
     var tempDataD: TextView? = null
     var imageurlDataD: ImageView? = null
     lateinit var loader: CircularProgressView
+
 
     
     @RequiresApi(Build.VERSION_CODES.O)

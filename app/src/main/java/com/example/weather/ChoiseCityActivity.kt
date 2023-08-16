@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -38,8 +39,8 @@ class ChoiseCityActivity : MainActivity() {
 
 
         act_choise_city_btn?.setOnClickListener {
-            cityPerem.capitalize()
-            cityPerem = act_choise_city_editText?.getText().toString().trim()
+
+            cityPerem = act_choise_city_editText?.getText().toString().trim().toLowerCase()
 
             if (cityPerem == "") {
                 Toast.makeText(this, "Введите название города!", Toast.LENGTH_SHORT).show()
@@ -47,7 +48,7 @@ class ChoiseCityActivity : MainActivity() {
 
 
 
-                if (myDbManager.checkCityExists(cityPerem))
+                if (myDbManager.checkCityExists(cityPerem.capitalize()))
                     Toast.makeText(this, "Такой город уже существует в списке!", Toast.LENGTH_SHORT).show()
                 else
                 {
@@ -62,6 +63,8 @@ class ChoiseCityActivity : MainActivity() {
             }
 
         }
+
+
 
 
     }
@@ -121,7 +124,10 @@ class ChoiseCityActivity : MainActivity() {
 
 
 
+
+        myDbManager.updateToDbCurData(item)
         myDbManager.insertToDbCurData(item)
+
 
 
         adapter.addCity(item)

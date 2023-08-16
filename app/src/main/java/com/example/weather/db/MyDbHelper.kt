@@ -1,5 +1,6 @@
 package com.example.weather.db
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -14,4 +15,9 @@ class MyDbHelper(context: Context) : SQLiteOpenHelper(context, MyDbClass.DATABAS
         db?.execSQL(MyDbClass.SQL_DELETE_TABLE)
         onCreate(db)
     }
+
+
+
+
+
 }
