@@ -31,11 +31,13 @@ import kotlin.math.roundToInt
 
 class DataDetailActivity : AppCompatActivity() {
 
-   var rcViewDataD: RecyclerView? = null
-    var cityDataD: TextView? = null
-    var tempDataD: TextView? = null
-    var imageurlDataD: ImageView? = null
-    lateinit var loader: CircularProgressView
+    private var rcViewDataD: RecyclerView? = null
+    private var cityDataD: TextView? = null
+    private var tempDataD: TextView? = null
+    private var imageurlDataD: ImageView? = null
+    private lateinit var loader: CircularProgressView
+
+    val adapterDay= DayWeatherAdapter()
 
 
     
@@ -45,11 +47,7 @@ class DataDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_data_detail)
 
-        cityDataD = findViewById(R.id.cityDataD)
-        tempDataD = findViewById(R.id.tempDataD)
-        imageurlDataD = findViewById(R.id.imageurlDataD)
-        rcViewDataD = findViewById(R.id.rcViewDataD)
-        loader = findViewById(R.id.loader)
+        initWidgets()
 
         initRcView2()
 
@@ -65,10 +63,16 @@ class DataDetailActivity : AppCompatActivity() {
 
     }
 
+    private fun initWidgets(){
+        cityDataD = findViewById(R.id.cityDataD)
+        tempDataD = findViewById(R.id.tempDataD)
+        imageurlDataD = findViewById(R.id.imageurlDataD)
+        rcViewDataD = findViewById(R.id.rcViewDataD)
+        loader = findViewById(R.id.loader)
+    }
 
 
-
-    fun initRcView2(){
+    private fun initRcView2(){
         rcViewDataD?.layoutManager = LinearLayoutManager(this@DataDetailActivity) //настройка rcview по вертикали
         rcViewDataD?.adapter = adapterDay
 
@@ -92,7 +96,6 @@ class DataDetailActivity : AppCompatActivity() {
             { result ->
 
                 val updateList =  parseS(result)
-//                adapterDay.addList(updateList as ArrayList<Weather>)
                 addList(updateList as ArrayList<Weather>)
                 loader.visibility = View.GONE
 
@@ -140,7 +143,7 @@ class DataDetailActivity : AppCompatActivity() {
 
 
             val icon = mas_item.getJSONArray("weather").getJSONObject(0).getString("icon")
-            var image2 =  "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
+            val image2 =  "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
 
 
 

@@ -23,8 +23,8 @@ var tempPerem: String = ""
 class ChoiseCityActivity : MainActivity() {
 
 
-     var act_choise_city_btn: Button? = null
-    var act_choise_city_editText: EditText? = null
+    private var act_choise_city_btn: Button? = null
+    private var act_choise_city_editText: EditText? = null
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -33,10 +33,7 @@ class ChoiseCityActivity : MainActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choise_city)
 
-        act_choise_city_btn = findViewById(R.id.act_choise_city_btn)
-        act_choise_city_editText = findViewById(R.id.act_choise_city_editText)
-        act_choise_city_editText?.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-
+        initWidgets()
 
         act_choise_city_btn?.setOnClickListener {
 
@@ -66,9 +63,13 @@ class ChoiseCityActivity : MainActivity() {
 
 
 
-
     }
 
+    private fun initWidgets(){
+        act_choise_city_btn = findViewById(R.id.act_choise_city_btn)
+        act_choise_city_editText = findViewById(R.id.act_choise_city_editText)
+        act_choise_city_editText?.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+    }
 
 
     private fun request(city: String){
@@ -125,11 +126,11 @@ class ChoiseCityActivity : MainActivity() {
 
         myDbManager.insertToDbCurData(item)
 
-        //adapter.addCity(item)
         addCity(item)
 
     }
-    fun addCity(weather: Weather){
+    @SuppressLint("NotifyDataSetChanged")
+    private fun addCity(weather: Weather){
         weatherList.add(weather)
         adapter.notifyDataSetChanged()
 

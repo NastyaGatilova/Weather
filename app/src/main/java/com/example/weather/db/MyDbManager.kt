@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.weather.Weather
 import com.example.weather.WeatherAdapter
-import com.example.weather.adapter
 import com.example.weather.isFirstOpen
 import com.example.weather.weatherList
 import kotlin.math.roundToInt
