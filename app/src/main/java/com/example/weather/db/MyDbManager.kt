@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.example.weather.Weather
+import com.example.weather.WeatherAdapter
 import com.example.weather.adapter
 import com.example.weather.isFirstOpen
+import com.example.weather.weatherList
 import kotlin.math.roundToInt
 
 class MyDbManager(context: Context) {
@@ -36,16 +39,18 @@ class MyDbManager(context: Context) {
 
 
 
-    fun updateToDbCurData(weather: Weather){
+fun updateToDbCurData(temper: String, img: String, city: String){
         val db = myDbHelper.writableDatabase
         val values = ContentValues().apply {
-            put(MyDbClass.COLUMN_NAME_CITY,  weather.city)
-            put(MyDbClass.COLUMN_NAME_TEMPER,  weather.temp)
-            put(MyDbClass.COLUMN_NAME_IMGURL, weather.imageurl)
+
+            put(MyDbClass.COLUMN_NAME_TEMPER,  temper)
+            put(MyDbClass.COLUMN_NAME_IMGURL, img)
 
 
         }
-        db?.update(MyDbClass.TABLE_NAME, values, "${MyDbClass.COLUMN_NAME_CITY}=?", arrayOf(weather.city))
+        db?.update(MyDbClass.TABLE_NAME, values, "${MyDbClass.COLUMN_NAME_CITY}=?", arrayOf(city))
+
+
 
 
     }
@@ -55,9 +60,9 @@ class MyDbManager(context: Context) {
 
 
     @SuppressLint("Range")
-    fun readDbCurData(){
+    fun readDbCurData(): ArrayList<Weather> {
 
-     //   db?.execSQL("UPDATE ${MyDbClass.TABLE_NAME} SET ${MyDbClass.COLUMN_NAME_TEMPER}= ${weather.temp}, ${MyDbClass.COLUMN_NAME_IMGURL}=${weather.imageurl}")
+        val dataList = ArrayList<Weather>()
 
         val cursor = db?.rawQuery(
             "SELECT ${MyDbClass.COLUMN_NAME_CITY} , ${MyDbClass.COLUMN_NAME_TEMPER}, ${MyDbClass.COLUMN_NAME_IMGURL} FROM ${MyDbClass.TABLE_NAME}",
@@ -78,17 +83,14 @@ class MyDbManager(context: Context) {
                 "",
                 "$img"
             )
+            dataList.add(item)
 
-            if (isFirstOpen == 1) {
-                adapter.addCity(item)
-            }
 
 
         }
 
-
         cursor.close()
-
+        return dataList
     }
 
 

@@ -92,7 +92,8 @@ class DataDetailActivity : AppCompatActivity() {
             { result ->
 
                 val updateList =  parseS(result)
-                adapterDay.addList(updateList as ArrayList<Weather>)
+//                adapterDay.addList(updateList as ArrayList<Weather>)
+                addList(updateList as ArrayList<Weather>)
                 loader.visibility = View.GONE
 
             },
@@ -110,7 +111,12 @@ class DataDetailActivity : AppCompatActivity() {
     }
 
 
+    fun addList(list: ArrayList<Weather>){
+        weatherDayList.clear()
+        weatherDayList.addAll(list)
+        adapterDay.notifyDataSetChanged()
 
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun parseS(result: String):List<Weather>
     {

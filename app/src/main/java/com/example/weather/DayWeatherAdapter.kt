@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 
-
 val weatherDayList = ArrayList<Weather>()
 class DayWeatherAdapter():RecyclerView.Adapter<DayWeatherAdapter.DayWeatherHolder>(){
 
@@ -20,16 +19,12 @@ class DayWeatherAdapter():RecyclerView.Adapter<DayWeatherAdapter.DayWeatherHolde
         val data_item_img: ImageView = item.findViewById(R.id.data_item_img)
 
 
-
-
         fun bind(weather: Weather){
             day.text = weather.day_week
             min_max_temp.text = weather.min_max_temp
             Picasso.get().load(weather.imageurl).into(data_item_img)
 
-
         }
-
 
 
     }
@@ -52,12 +47,7 @@ class DayWeatherAdapter():RecyclerView.Adapter<DayWeatherAdapter.DayWeatherHolde
     }
 
 
-    fun addList(list: ArrayList<Weather>){
-        weatherDayList.clear()
-        weatherDayList.addAll(list)
-        notifyDataSetChanged()
 
-    }
 
 
 }

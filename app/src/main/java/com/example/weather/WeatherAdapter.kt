@@ -1,7 +1,5 @@
 package com.example.weather
 
-
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,11 +20,13 @@ class WeatherAdapter():RecyclerView.Adapter<WeatherAdapter.WeatherHolder>(){
 
 
 
+
           fun bind(weather: Weather){
                 city_listatem.text = weather.city
                 temp_listatem.text = weather.temp
 
             }
+
 
 
 
@@ -45,18 +45,6 @@ class WeatherAdapter():RecyclerView.Adapter<WeatherAdapter.WeatherHolder>(){
 
         holder.bind(weatherList[position])
 
-
-        holder.itemView.setOnClickListener {
-
-           helpWeather = weatherList[position]
-
-
-            val intent = Intent(holder.itemView.context, DataDetailActivity::class.java)
-            holder.itemView.context.startActivity(intent)
-
-
-        }
-
         }
 
 
@@ -67,27 +55,7 @@ class WeatherAdapter():RecyclerView.Adapter<WeatherAdapter.WeatherHolder>(){
     }
 
 
-   
-
-    fun addCity(weather: Weather){
-        weatherList.add(weather)
-        notifyDataSetChanged()
-
-    }
-
-
-
-    fun deleteItem(position: Int) {
-
-
-        weatherList.removeAt(position)
-
-        notifyItemRemoved(position)
-
-        notifyItemRangeChanged(position, weatherList.size)
-
-
-    }
-
 
 }
+
+

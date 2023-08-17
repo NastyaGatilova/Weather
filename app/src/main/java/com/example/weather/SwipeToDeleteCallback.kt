@@ -22,7 +22,18 @@ class SwipeToDeleteCallback(private val adapter: WeatherAdapter) : ItemTouchHelp
 
         val position = viewHolder.adapterPosition
         myDbManager.deleteCity(weatherList[position].city)
-        adapter.deleteItem(position)
+       // adapter.deleteItem(position)
+        deleteItem(position)
+
+    }
+
+    fun deleteItem(position: Int) {
+
+
+        weatherList.removeAt(position)
+        adapter.notifyItemRemoved(position)
+        adapter.notifyItemRangeChanged(position, weatherList.size)
+
 
     }
 }

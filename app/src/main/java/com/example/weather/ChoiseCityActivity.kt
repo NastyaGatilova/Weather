@@ -109,11 +109,11 @@ class ChoiseCityActivity : MainActivity() {
         val tempTec = mainn.getString("temp").toDouble().roundToInt()
         tempPerem =tempTec.toString()
 
-       val icon = mainObject.getJSONArray("weather").getJSONObject(0).getString("icon")
+        val icon = mainObject.getJSONArray("weather").getJSONObject(0).getString("icon")
 
         var image2 =  "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
-       val min_t = "9 °C"
-       val max_t = "20 °C"
+        val min_t = "9 °C"
+        val max_t = "20 °C"
         val item = Weather(
             "${cityPerem.capitalize()}",
             "$tempTec °C",
@@ -123,18 +123,17 @@ class ChoiseCityActivity : MainActivity() {
         )
 
 
-
-
-        myDbManager.updateToDbCurData(item)
         myDbManager.insertToDbCurData(item)
 
-
-
-        adapter.addCity(item)
-
+        //adapter.addCity(item)
+        addCity(item)
 
     }
+    fun addCity(weather: Weather){
+        weatherList.add(weather)
+        adapter.notifyDataSetChanged()
 
+    }
 
     override fun onBackPressed() {
 
