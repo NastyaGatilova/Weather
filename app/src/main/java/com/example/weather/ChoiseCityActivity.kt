@@ -1,6 +1,7 @@
 package com.example.weather
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -10,22 +11,24 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.weather.db.MyDbManager
 import org.json.JSONObject
 import kotlin.math.roundToInt
 
 
+
+
+
 var cityPerem: String = ""
 var tempPerem: String = ""
-
 class ChoiseCityActivity : MainActivity() {
-
 
     private var act_choise_city_btn: Button? = null
     private var act_choise_city_editText: EditText? = null
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -43,17 +46,11 @@ class ChoiseCityActivity : MainActivity() {
                 Toast.makeText(this, "Введите название города!", Toast.LENGTH_SHORT).show()
             } else{
 
-
-
                 if (myDbManager.checkCityExists(cityPerem.capitalize()))
                     Toast.makeText(this, "Такой город уже существует в списке!", Toast.LENGTH_SHORT).show()
                 else
                 {
                     request(cityPerem)
-                    val intent = Intent(this, MainActivity::class.java);
-                    startActivity(intent);
-
-                    finish()
                 }
 
 
@@ -64,6 +61,7 @@ class ChoiseCityActivity : MainActivity() {
 
 
     }
+
 
     private fun initWidgets(){
         act_choise_city_btn = findViewById(R.id.act_choise_city_btn)
@@ -112,32 +110,27 @@ class ChoiseCityActivity : MainActivity() {
 
         val icon = mainObject.getJSONArray("weather").getJSONObject(0).getString("icon")
 
-        var image2 =  "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
-        val min_t = "9 °C"
-        val max_t = "20 °C"
+        val image2 =  "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
         val item = Weather(
             "${cityPerem.capitalize()}",
             "$tempTec °C",
             "ВТ",
-            "$min_t / $max_t",
+            " / ",
             "$image2"
         )
 
-
         myDbManager.insertToDbCurData(item)
 
-        addCity(item)
+        val editIntent = Intent().apply{
+            putExtra("weather", item)
+        }
+        setResult(RESULT_OK, editIntent)
+        finish()
 
-    }
-    @SuppressLint("NotifyDataSetChanged")
-    private fun addCity(weather: Weather){
-        weatherList.add(weather)
-        adapter.notifyDataSetChanged()
 
     }
 
     override fun onBackPressed() {
-
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         myDbManager.closeDb()

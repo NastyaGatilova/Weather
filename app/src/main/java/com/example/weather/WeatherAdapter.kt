@@ -4,13 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.MutableLiveData
 
 import androidx.recyclerview.widget.RecyclerView
 
 
 lateinit var helpWeather:Weather
 
-val weatherList = ArrayList<Weather>()
+var weatherList = mutableListOf<Weather>()
+
 class WeatherAdapter():RecyclerView.Adapter<WeatherAdapter.WeatherHolder>(){
 
 
@@ -53,6 +55,8 @@ class WeatherAdapter():RecyclerView.Adapter<WeatherAdapter.WeatherHolder>(){
     override fun getItemCount(): Int {
         return weatherList.size
     }
+
+
 
 
 
