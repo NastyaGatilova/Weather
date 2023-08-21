@@ -51,6 +51,7 @@ class ChoiseCityActivity : MainActivity() {
                 else
                 {
                     request(cityPerem)
+
                 }
 
 
@@ -125,6 +126,10 @@ class ChoiseCityActivity : MainActivity() {
             putExtra("weather", item)
         }
         setResult(RESULT_OK, editIntent)
+
+
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
         finish()
 
 

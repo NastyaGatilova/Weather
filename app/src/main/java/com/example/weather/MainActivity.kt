@@ -57,6 +57,7 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
                 addCity(it.data?.getSerializableExtra("weather") as Weather)
                 myDbManager.updateToDbCurData(it.data?.getSerializableExtra("weather") as Weather)
             }
+
         }
 
         initWidgets()
@@ -185,14 +186,18 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
     fun newItemList(view: View?){
 
         editLauncher?.launch(Intent(this@MainActivity, ChoiseCityActivity::class.java))
+        finish()
 
     }
+
+
 
 
     override fun onItemClick(view: View, position: Int) {
         helpWeather = weatherList[position]
         val intent = Intent(this, DataDetailActivity::class.java)
         startActivity(intent)
+
     }
 
 
