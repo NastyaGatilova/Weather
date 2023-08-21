@@ -5,9 +5,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import com.example.weather.Weather
-import com.example.weather.isFirstOpen
-import com.example.weather.weatherList
-import java.io.Serializable
 import kotlin.math.roundToInt
 
 class MyDbManager(context: Context)  {

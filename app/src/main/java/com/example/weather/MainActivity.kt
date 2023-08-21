@@ -27,10 +27,7 @@ import kotlin.math.roundToInt
 
 
 const val API_key="1bb93494997fe83bb6d678b29f57d199"
-var isFirstOpen = 0
 
-
-//val Wadapter= WeatherAdapter()
 
 open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnItemClickListener {
     val myDbManager = MyDbManager(this)
@@ -43,6 +40,8 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
     private val Wadapter= WeatherAdapter()
 
     private var editLauncher: ActivityResultLauncher<Intent>? = null
+
+
 
 
     @SuppressLint("SuspiciousIndentation", "MissingInflatedId", "NotifyDataSetChanged")
@@ -76,7 +75,8 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
 
         weatherList.clear()
         addCity2(item)
-        }
+
+       }
 
     }
 
@@ -126,7 +126,7 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
             Request.Method.GET,
             url,
             {
-                    result ->  Log.d("--REQ--", "Результат: $city :  ${result}")
+                    result ->
                 parse(result, city)
             },
             {
@@ -140,6 +140,10 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
 
     @SuppressLint("NotifyDataSetChanged")
     private fun parse(result: String, city:String) {
+
+
+
+
         val mainObject = JSONObject(result)
         val mainn = mainObject.getJSONObject("main")
         val tempTec = mainn.getString("temp").toDouble().roundToInt()
@@ -159,13 +163,7 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
         )
 
 
-
-
         myDbManager.updateToDbCurData(item)
-
-
-        Log.d("--REQ--", "В БД: $city :  ${item}")
-
 
 
 
