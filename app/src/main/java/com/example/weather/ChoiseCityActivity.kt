@@ -27,8 +27,8 @@ var cityPerem: String = ""
 var tempPerem: String = ""
 class ChoiseCityActivity : MainActivity() {
 
-    private var act_choise_city_btn: Button? = null
-    private var act_choise_city_editText: EditText? = null
+    private var cityBtn: Button? = null
+    private var cityEditText: EditText? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -38,23 +38,14 @@ class ChoiseCityActivity : MainActivity() {
 
         initWidgets()
 
-        act_choise_city_btn?.setOnClickListener {
+        cityBtn?.setOnClickListener {
 
-            cityPerem = act_choise_city_editText?.getText().toString().trim().toLowerCase()
+            cityPerem = cityEditText?.getText().toString().trim().toLowerCase()
 
-            if (cityPerem == "") {
-                Toast.makeText(this, "Введите название города!", Toast.LENGTH_SHORT).show()
-            } else{
-
-                if (myDbManager.checkCityExists(cityPerem.capitalize()))
-                    Toast.makeText(this, "Такой город уже существует в списке!", Toast.LENGTH_SHORT).show()
-                else
-                {
-                    request(cityPerem)
-
-                }
-
-
+            if (cityPerem == "") Toast.makeText(this, "Введите название города!", Toast.LENGTH_SHORT).show()
+            else{
+                if (myDbManager.checkCityExists(cityPerem.capitalize())) Toast.makeText(this, "Такой город уже существует в списке!", Toast.LENGTH_SHORT).show()
+                else request(cityPerem)
             }
 
         }
@@ -65,9 +56,9 @@ class ChoiseCityActivity : MainActivity() {
 
 
     private fun initWidgets(){
-        act_choise_city_btn = findViewById(R.id.act_choise_city_btn)
-        act_choise_city_editText = findViewById(R.id.act_choise_city_editText)
-        act_choise_city_editText?.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+        cityBtn = findViewById(R.id.cityBtn)
+        cityEditText = findViewById(R.id.cityEditText)
+        cityEditText?.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
     }
 
 

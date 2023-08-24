@@ -7,23 +7,21 @@ import android.database.sqlite.SQLiteDatabase
 import com.example.weather.Weather
 import kotlin.math.roundToInt
 
-class MyDbManager(context: Context)  {
+class MyDbManager(context: Context) {
     val myDbHelper = MyDbHelper(context)
     var db: SQLiteDatabase? = null
 
 
-
-    fun openDb(){
-         db = myDbHelper.writableDatabase
+    fun openDb() {
+        db = myDbHelper.writableDatabase
     }
 
 
-
-    fun insertToDbCurData(weather: Weather){
+    fun insertToDbCurData(weather: Weather) {
 
         val values = ContentValues().apply {
-            put(MyDbClass.COLUMN_NAME_CITY,  weather.city)
-            put(MyDbClass.COLUMN_NAME_TEMPER,  weather.temp)
+            put(MyDbClass.COLUMN_NAME_CITY, weather.city)
+            put(MyDbClass.COLUMN_NAME_TEMPER, weather.temp)
             put(MyDbClass.COLUMN_NAME_IMGURL, weather.imageurl)
 
 
@@ -32,19 +30,22 @@ class MyDbManager(context: Context)  {
     }
 
 
-fun updateToDbCurData(weather: Weather){
+    fun updateToDbCurData(weather: Weather) {
         val db = myDbHelper.writableDatabase
         val values = ContentValues().apply {
 
-            put(MyDbClass.COLUMN_NAME_CITY,  weather.city)
-            put(MyDbClass.COLUMN_NAME_TEMPER,  weather.temp)
+            put(MyDbClass.COLUMN_NAME_CITY, weather.city)
+            put(MyDbClass.COLUMN_NAME_TEMPER, weather.temp)
             put(MyDbClass.COLUMN_NAME_IMGURL, weather.imageurl)
 
 
         }
-    db?.update(MyDbClass.TABLE_NAME, values, "${MyDbClass.COLUMN_NAME_CITY}=?", arrayOf(weather.city))
-
-
+        db?.update(
+            MyDbClass.TABLE_NAME,
+            values,
+            "${MyDbClass.COLUMN_NAME_CITY}=?",
+            arrayOf(weather.city)
+        )
 
 
     }
@@ -63,7 +64,9 @@ fun updateToDbCurData(weather: Weather){
 
         while (cursor?.moveToNext()!!) {
             val city = cursor?.getString(cursor.getColumnIndex(MyDbClass.COLUMN_NAME_CITY))
-            val temperature = cursor.getFloat(cursor.getColumnIndex(MyDbClass.COLUMN_NAME_TEMPER)).toDouble().roundToInt().toString()
+            val temperature =
+                cursor.getFloat(cursor.getColumnIndex(MyDbClass.COLUMN_NAME_TEMPER)).toDouble()
+                    .roundToInt().toString()
             val img = cursor?.getString(cursor.getColumnIndex(MyDbClass.COLUMN_NAME_IMGURL))
 
 
@@ -79,7 +82,6 @@ fun updateToDbCurData(weather: Weather){
             dataList.add(item)
 
 
-
         }
 
         cursor.close()
@@ -87,14 +89,11 @@ fun updateToDbCurData(weather: Weather){
     }
 
 
+    fun deleteFromTable() {
+        db?.execSQL("DELETE FROM ${MyDbClass.TABLE_NAME}")
+    }
 
-
-
-    fun deleteFromTable(){
-    db?.execSQL("DELETE FROM ${MyDbClass.TABLE_NAME}")
-}
-
-    fun deleteCity(cityName: String){
+    fun deleteCity(cityName: String) {
 
         val db = myDbHelper.writableDatabase
         val selection = "${MyDbClass.COLUMN_NAME_CITY} = ?"
@@ -111,7 +110,7 @@ fun updateToDbCurData(weather: Weather){
         return exist
     }
 
-    fun closeDb(){
+    fun closeDb() {
         myDbHelper.close()
     }
 

@@ -14,7 +14,7 @@
     >
 
     <TextView
-        android:id="@+id/city_listatem"
+        android:id="@+id/cityListAtem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/temp_listatem"
+        android:id="@+id/tempListAtem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"

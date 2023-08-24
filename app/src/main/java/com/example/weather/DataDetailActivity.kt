@@ -37,10 +37,9 @@ class DataDetailActivity : AppCompatActivity() {
     private var imageurlDataD: ImageView? = null
     private lateinit var loader: CircularProgressView
 
-    val adapterDay= DayWeatherAdapter()
+    val adapterDay = DayWeatherAdapter()
 
 
-    
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,11 +58,9 @@ class DataDetailActivity : AppCompatActivity() {
         requestList(helpWeather.city)
 
 
-
-
     }
 
-    private fun initWidgets(){
+    private fun initWidgets() {
         cityDataD = findViewById(R.id.cityDataD)
         tempDataD = findViewById(R.id.tempDataD)
         imageurlDataD = findViewById(R.id.imageurlDataD)
@@ -72,8 +69,9 @@ class DataDetailActivity : AppCompatActivity() {
     }
 
 
-    private fun initRcView2(){
-        rcViewDataD?.layoutManager = LinearLayoutManager(this@DataDetailActivity) //настройка rcview по вертикали
+    private fun initRcView2() {
+        rcViewDataD?.layoutManager =
+            LinearLayoutManager(this@DataDetailActivity) //настройка rcview по вертикали
         rcViewDataD?.adapter = adapterDay
 
 
@@ -83,7 +81,7 @@ class DataDetailActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun requestList(city: String) {
 
-        val url=  "https://api.openweathermap.org/data/2.5/forecast?" +
+        val url = "https://api.openweathermap.org/data/2.5/forecast?" +
                 "q=$city" +
                 "&appid=${API_key}" +
                 "&units=metric"
@@ -95,17 +93,17 @@ class DataDetailActivity : AppCompatActivity() {
             url,
             { result ->
 
-                val updateList =  parseS(result)
+                val updateList = parseS(result)
                 addList(updateList as ArrayList<Weather>)
                 loader.visibility = View.GONE
 
             },
-            {
-                    error ->
+            { error ->
 
                 Log.d("MyLog3", "Error: $error")
                 loader.visibility = View.VISIBLE
-                Toast.makeText(this, "Отсутствие подключения к Интернету", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Отсутствие подключения к Интернету", Toast.LENGTH_SHORT)
+                    .show()
 
             }
         )
@@ -114,15 +112,15 @@ class DataDetailActivity : AppCompatActivity() {
     }
 
 
-    fun addList(list: ArrayList<Weather>){
+    fun addList(list: ArrayList<Weather>) {
         weatherDayList.clear()
         weatherDayList.addAll(list)
         adapterDay.notifyDataSetChanged()
 
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun parseS(result: String):List<Weather>
-    {
+    private fun parseS(result: String): List<Weather> {
         val list = ArrayList<Weather>()
         val mainObject = JSONObject(result)
 
@@ -131,20 +129,25 @@ class DataDetailActivity : AppCompatActivity() {
             val mas_item = arrList[i] as JSONObject
             val dt = mas_item.getString("dt")
 
-            val dateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(dt.toLong()), ZoneId.systemDefault())
-            val dayOfWeek = dateTime.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale("ru")).substring(0, 2)
+            val dateTime =
+                LocalDateTime.ofInstant(Instant.ofEpochSecond(dt.toLong()), ZoneId.systemDefault())
+            val dayOfWeek =
+                dateTime.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale("ru")).substring(0, 2)
             val time = dateTime.toLocalTime()
 
 
-
-            val temp_min = mas_item.getJSONObject("main").getString("temp_min").toDouble().roundToInt().toString()
-            val temp_max = mas_item.getJSONObject("main").getString("temp_max").toDouble().roundToInt().toString()
+            val temp_min =
+                mas_item.getJSONObject("main").getString("temp_min").toDouble().roundToInt()
+                    .toString()
+            val temp_max =
+                mas_item.getJSONObject("main").getString("temp_max").toDouble().roundToInt()
+                    .toString()
             val temp_min_max = "$temp_min°C/$temp_max°C"
 
 
             val icon = mas_item.getJSONArray("weather").getJSONObject(0).getString("icon")
-            val image2 =  "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
-
+            val image2 =
+                "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
 
 
             val item = Weather(
@@ -157,7 +160,7 @@ class DataDetailActivity : AppCompatActivity() {
 
             list.add(item)
         }
-    return list
+        return list
     }
 }
 

@@ -8,7 +8,7 @@
 
 
     <EditText
-        android:id="@+id/act_choise_city_editText"
+        android:id="@+id/cityEditText"
         android:layout_width="278dp"
         android:layout_height="86dp"
         android:ems="10"
@@ -23,7 +23,7 @@
         app:layout_constraintVertical_bias="0.176" />
 
     <Button
-        android:id="@+id/act_choise_city_btn"
+        android:id="@+id/cityBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/btn_choise_city"
@@ -31,7 +31,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/act_choise_city_editText"
+        app:layout_constraintTop_toBottomOf="@+id/cityEditText"
         app:layout_constraintVertical_bias="0.08" />
 
 

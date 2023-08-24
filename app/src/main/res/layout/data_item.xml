@@ -25,7 +25,7 @@
 
 
     <ImageView
-        android:id="@+id/data_item_img"
+        android:id="@+id/dataItemImg"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginEnd="100dp"
@@ -34,7 +34,7 @@
         android:layout_gravity="end"/>
 
     <TextView
-        android:id="@+id/min_max_temp"
+        android:id="@+id/minMaxTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"

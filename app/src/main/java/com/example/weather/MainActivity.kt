@@ -26,22 +26,20 @@ import org.json.JSONObject
 import kotlin.math.roundToInt
 
 
-const val API_key="1bb93494997fe83bb6d678b29f57d199"
+const val API_key = "1bb93494997fe83bb6d678b29f57d199"
 
 
-open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnItemClickListener {
+open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnItemClickListener {
     val myDbManager = MyDbManager(this)
 
 
-    private var act_main_rcView: RecyclerView? = null
-    private var city_listatem: TextView? = null
-    private var temp_listatem: TextView? = null
+    private var rcView: RecyclerView? = null
+    private var cityListAtem: TextView? = null
+    private var tempListAtem: TextView? = null
 
-    private val Wadapter= WeatherAdapter()
+    private val weatherAdapter = WeatherAdapter()
 
     private var editLauncher: ActivityResultLauncher<Intent>? = null
-
-
 
 
     @SuppressLint("SuspiciousIndentation", "MissingInflatedId", "NotifyDataSetChanged")
@@ -52,8 +50,8 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
         myDbManager.openDb()
 
 
-        editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-            if(it.resultCode == RESULT_OK){
+        editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
                 addCity(it.data?.getSerializableExtra("weather") as Weather)
                 myDbManager.updateToDbCurData(it.data?.getSerializableExtra("weather") as Weather)
             }
@@ -69,69 +67,71 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
     @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
-        Wadapter.notifyDataSetChanged()
-        if (myDbManager.readDbCurData().isNotEmpty()){
-           searchСity()
-        val item = myDbManager.readDbCurData()
 
-        weatherList.clear()
-        addCity2(item)
+        val readDb = myDbManager.readDbCurData()
+        if (readDb.isNotEmpty()) {
+            searchСity(readDb)
+            //val item = readDb
 
-       }
+            weatherList.clear()
+            addCity2(readDb)
+
+        }
 
     }
 
-    private fun initWidgets(){
-        act_main_rcView = findViewById(R.id.act_main_rcView)
-        city_listatem = findViewById(R.id.city_listatem)
-        temp_listatem = findViewById(R.id.temp_listatem)
+    private fun initWidgets() {
+        rcView = findViewById(R.id.rcView)
+        cityListAtem = findViewById(R.id.cityListAtem)
+        tempListAtem = findViewById(R.id.tempListAtem)
     }
 
-    private fun initRcView(){
+    private fun initRcView() {
 
-        act_main_rcView?.layoutManager = LinearLayoutManager(this@MainActivity) //настройка rcview по вертикали
-        act_main_rcView?.adapter = Wadapter
-        val itemClickListener = RecyclerViewItemClickListener(this, act_main_rcView!!, this)
-        act_main_rcView?.addOnItemTouchListener(itemClickListener)
+        rcView?.layoutManager =
+            LinearLayoutManager(this@MainActivity) //настройка rcview по вертикали
+        rcView?.adapter = weatherAdapter
+        val itemClickListener = RecyclerViewItemClickListener(this, rcView!!, this)
+        rcView?.addOnItemTouchListener(itemClickListener)
 
-        val swipeToDeleteCallback = SwipeToDeleteCallback(Wadapter)
+        val swipeToDeleteCallback = SwipeToDeleteCallback(weatherAdapter)
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(act_main_rcView)
-       }
+        itemTouchHelper.attachToRecyclerView(rcView)
+    }
 
 
     @SuppressLint("NotifyDataSetChanged")
     fun addCity2(weather: MutableList<Weather>) {
         weatherList.addAll(weather)
-        Wadapter.notifyDataSetChanged()
+        weatherAdapter.notifyDataSetChanged()
     }
 
     @SuppressLint("SuspiciousIndentation")
-    private fun searchСity(){
-    val helpList: MutableList<Weather>
-    helpList = myDbManager.readDbCurData()
-        if (helpList.isNotEmpty()) {
-         for (item in helpList) {
-           request(item.city)
+    private fun searchСity(helpList: MutableList<Weather>) {
+        //val helpList: MutableList<Weather>
+        // helpList = myDbManager.readDbCurData()
+
+        for (item in helpList) {
+            request(item.city)
+
         }
-     }
-}
-    private fun request(city: String){
+
+    }
+
+    private fun request(city: String) {
 
         val url = "https://api.openweathermap.org/data/2.5/weather?" +
                 "q=$city" +
-                "&appid=${API_key}"+
+                "&appid=${API_key}" +
                 "&units=metric"
         val queue = Volley.newRequestQueue(applicationContext)
         val request = StringRequest(
             Request.Method.GET,
             url,
-            {
-                    result ->
+            { result -> //Log.d("--Res--", "$city $result")
                 parse(result, city)
             },
-            {
-                    error ->
+            { error ->
 
             }
         )
@@ -140,19 +140,17 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun parse(result: String, city:String) {
-
-
-
+    private fun parse(result: String, city: String) {
 
         val mainObject = JSONObject(result)
         val mainn = mainObject.getJSONObject("main")
         val tempTec = mainn.getString("temp").toDouble().roundToInt()
-     //   tempPerem =tempTec.toString()
+        //   tempPerem =tempTec.toString()
 
         val icon = mainObject.getJSONArray("weather").getJSONObject(0).getString("icon")
 
-        val image2 =  "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
+        val image2 =
+            "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
 
 
         val item = Weather(
@@ -168,29 +166,25 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
 
 
 
-        Wadapter.notifyDataSetChanged()
+        weatherAdapter.notifyDataSetChanged()
 
 
     }
 
 
-
-
-    private fun addCity(weather: Weather){
+    private fun addCity(weather: Weather) {
 
         weatherList.add(weather)
-        Wadapter.notifyDataSetChanged()
+        weatherAdapter.notifyDataSetChanged()
 
     }
 
-    fun newItemList(view: View?){
+    fun newItemList(view: View?) {
 
         editLauncher?.launch(Intent(this@MainActivity, ChoiseCityActivity::class.java))
         finish()
 
     }
-
-
 
 
     override fun onItemClick(view: View, position: Int) {
@@ -203,7 +197,11 @@ open class MainActivity : AppCompatActivity(),RecyclerViewItemClickListener.OnIt
 
 }
 
-class RecyclerViewItemClickListener(context: Context, recyclerView: RecyclerView, private val mListener: OnItemClickListener?) :
+class RecyclerViewItemClickListener(
+    context: Context,
+    recyclerView: RecyclerView,
+    private val mListener: OnItemClickListener?
+) :
     RecyclerView.OnItemTouchListener {
 
     private val mGestureDetector: GestureDetector
@@ -213,11 +211,12 @@ class RecyclerViewItemClickListener(context: Context, recyclerView: RecyclerView
     }
 
     init {
-        mGestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onSingleTapUp(e: MotionEvent): Boolean {
-                return true
-            }
-        })
+        mGestureDetector =
+            GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+                override fun onSingleTapUp(e: MotionEvent): Boolean {
+                    return true
+                }
+            })
     }
 
     override fun onInterceptTouchEvent(view: RecyclerView, e: MotionEvent): Boolean {
