@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.example.weather.Weather
 import kotlin.math.roundToInt
 
@@ -27,27 +28,6 @@ class MyDbManager(context: Context) {
 
         }
         db?.insert(MyDbClass.TABLE_NAME, null, values)
-    }
-
-
-    fun updateToDbCurData(weather: Weather) {
-        val db = myDbHelper.writableDatabase
-        val values = ContentValues().apply {
-
-            put(MyDbClass.COLUMN_NAME_CITY, weather.city)
-            put(MyDbClass.COLUMN_NAME_TEMPER, weather.temp)
-            put(MyDbClass.COLUMN_NAME_IMGURL, weather.imageurl)
-
-
-        }
-        db?.update(
-            MyDbClass.TABLE_NAME,
-            values,
-            "${MyDbClass.COLUMN_NAME_CITY}=?",
-            arrayOf(weather.city)
-        )
-
-
     }
 
 
@@ -88,6 +68,46 @@ class MyDbManager(context: Context) {
         return dataList
     }
 
+
+    fun updateTable(temp: String, img: String, city: String){
+        val db = myDbHelper.writableDatabase
+        val values = ContentValues().apply {
+
+
+            put(MyDbClass.COLUMN_NAME_TEMPER, temp)
+            put(MyDbClass.COLUMN_NAME_IMGURL, img)
+
+
+        }
+        db?.update(
+            MyDbClass.TABLE_NAME,
+            values,
+            "${MyDbClass.COLUMN_NAME_CITY}=?",
+            arrayOf(city)
+        )
+
+
+    }
+    @SuppressLint("Range")
+    fun readTable():MutableList<String> {
+
+        val cityList = mutableListOf<String>()
+
+        val cursor2 = db?.rawQuery(
+            "SELECT ${MyDbClass.COLUMN_NAME_CITY} FROM ${MyDbClass.TABLE_NAME}",
+            null
+        )
+
+
+        while (cursor2?.moveToNext()!!) {
+            val city = cursor2?.getString(cursor2.getColumnIndex(MyDbClass.COLUMN_NAME_CITY))
+            cityList.add(city.toString())
+        }
+
+        cursor2.close()
+        return cityList
+
+    }
 
     fun deleteFromTable() {
         db?.execSQL("DELETE FROM ${MyDbClass.TABLE_NAME}")

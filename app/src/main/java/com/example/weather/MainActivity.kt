@@ -23,6 +23,9 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.weather.db.MyDbManager
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.math.roundToInt
 
 
@@ -31,15 +34,13 @@ const val API_key = "1bb93494997fe83bb6d678b29f57d199"
 
 open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnItemClickListener {
     val myDbManager = MyDbManager(this)
-
-
     private var rcView: RecyclerView? = null
     private var cityListAtem: TextView? = null
     private var tempListAtem: TextView? = null
 
     private val weatherAdapter = WeatherAdapter()
-
     private var editLauncher: ActivityResultLauncher<Intent>? = null
+
 
 
     @SuppressLint("SuspiciousIndentation", "MissingInflatedId", "NotifyDataSetChanged")
@@ -48,36 +49,27 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
         setContentView(R.layout.activity_main)
 
         myDbManager.openDb()
-
+        initWidgets()
+        initRcView()
 
         editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
                 addCity(it.data?.getSerializableExtra("weather") as Weather)
-                myDbManager.updateToDbCurData(it.data?.getSerializableExtra("weather") as Weather)
             }
 
         }
-
-        initWidgets()
-        initRcView()
-
     }
 
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
-
-        val readDb = myDbManager.readDbCurData()
-        if (readDb.isNotEmpty()) {
-            searchСity(readDb)
-            //val item = readDb
-
-            weatherList.clear()
-            addCity2(readDb)
-
+        val readCity = myDbManager.readTable()
+        if (readCity.isNotEmpty()) {
+           for (item in readCity){
+               request(item)
+           }
         }
-
     }
 
     private fun initWidgets() {
@@ -100,83 +92,59 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
     }
 
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun addCity2(weather: MutableList<Weather>) {
-        weatherList.addAll(weather)
-        weatherAdapter.notifyDataSetChanged()
-    }
-
-    @SuppressLint("SuspiciousIndentation")
-    private fun searchСity(helpList: MutableList<Weather>) {
-        //val helpList: MutableList<Weather>
-        // helpList = myDbManager.readDbCurData()
-
-        for (item in helpList) {
-            request(item.city)
-
-        }
-
-    }
-
-    private fun request(city: String) {
-
+    private fun request(city: String)  {
         val url = "https://api.openweathermap.org/data/2.5/weather?" +
                 "q=$city" +
                 "&appid=${API_key}" +
                 "&units=metric"
+        var helpTemp = ""
+        var helpImg = ""
         val queue = Volley.newRequestQueue(applicationContext)
         val request = StringRequest(
             Request.Method.GET,
             url,
-            { result -> //Log.d("--Res--", "$city $result")
-                parse(result, city)
-            },
-            { error ->
+            { result ->
 
-            }
+                helpTemp = parseTemp(result)
+                helpImg = parseImg(result)
+                myDbManager.updateTable(helpTemp, helpImg,  city)
+                val readDb = myDbManager.readDbCurData()
+                weatherList.clear()
+                weatherList.addAll(readDb)
+                runOnUiThread { weatherAdapter.notifyDataSetChanged() }
+            },
+            { error -> }
         )
         queue.add(request)
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun parseTemp(result: String) :String {
+
+        val mainObject = JSONObject(result)
+        val mainn = mainObject.getJSONObject("main")
+        val tempTec = mainn.getString("temp").toDouble().roundToInt().toString()
+
+        return tempTec
+    }
+
+        @SuppressLint("NotifyDataSetChanged")
+    private fun parseImg(result: String)  :String {
+
+        val mainObject = JSONObject(result)
+        val icon = mainObject.getJSONArray("weather").getJSONObject(0).getString("icon")
+        val image2 =
+            "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
+
+            return image2
 
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun parse(result: String, city: String) {
-
-        val mainObject = JSONObject(result)
-        val mainn = mainObject.getJSONObject("main")
-        val tempTec = mainn.getString("temp").toDouble().roundToInt()
-        //   tempPerem =tempTec.toString()
-
-        val icon = mainObject.getJSONArray("weather").getJSONObject(0).getString("icon")
-
-        val image2 =
-            "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
-
-
-        val item = Weather(
-            "${city.capitalize()}",
-            "$tempTec °C",
-            "ВТ",
-            "1 / 1",
-            "$image2"
-        )
-
-
-        myDbManager.updateToDbCurData(item)
-
-
-
-        weatherAdapter.notifyDataSetChanged()
-
-
-    }
-
-
     private fun addCity(weather: Weather) {
-
         weatherList.add(weather)
         weatherAdapter.notifyDataSetChanged()
-
     }
 
     fun newItemList(view: View?) {
