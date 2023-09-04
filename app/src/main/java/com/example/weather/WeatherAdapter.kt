@@ -3,8 +3,8 @@ package com.example.weather
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.lifecycle.MutableLiveData
+
+
 
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weather.databinding.ListItemBinding

@@ -1,23 +1,16 @@
 package com.example.weather
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.weather.databinding.ActivityChoiseCityBinding
-import com.example.weather.databinding.ActivityMainBinding
-import com.example.weather.db.MyDbManager
 import org.json.JSONObject
 import kotlin.math.roundToInt
 
