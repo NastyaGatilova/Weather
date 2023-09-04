@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.weather.databinding.ActivityChoiseCityBinding
+import com.example.weather.databinding.ActivityDataDetailBinding
 import com.example.weather.db.MyDbManager
 import com.github.rahatarmanahmed.cpv.CircularProgressView
 import com.squareup.picasso.Picasso
@@ -31,48 +33,45 @@ import kotlin.math.roundToInt
 
 class DataDetailActivity : AppCompatActivity() {
 
-    private var rcViewDataD: RecyclerView? = null
-    private var cityDataD: TextView? = null
-    private var tempDataD: TextView? = null
-    private var imageurlDataD: ImageView? = null
-    private lateinit var loader: CircularProgressView
+private lateinit var binding: ActivityDataDetailBinding
 
     val adapterDay = DayWeatherAdapter()
+
+    var helpCity = ""
+    var helpTemp = ""
+    var helpImageurl = ""
 
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_data_detail)
-
-        initWidgets()
+        binding = ActivityDataDetailBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         initRcView2()
 
-        cityDataD?.text = helpWeather.city
-        tempDataD?.text = "${helpWeather.temp}"
-        Picasso.get().load(helpWeather.imageurl).into(imageurlDataD)
+
+        helpCity = intent.getStringExtra("city").toString()
+        helpTemp = intent.getStringExtra("temp").toString()
+        helpImageurl = intent.getStringExtra("imageurl").toString()
+
+        binding.cityDataD?.text = helpCity
+        binding.tempDataD?.text = helpTemp
+        Picasso.get().load(helpImageurl).into(binding.imageurlDataD)
 
 
-        requestList(helpWeather.city)
+        requestList(helpCity)
 
 
-    }
-
-    private fun initWidgets() {
-        cityDataD = findViewById(R.id.cityDataD)
-        tempDataD = findViewById(R.id.tempDataD)
-        imageurlDataD = findViewById(R.id.imageurlDataD)
-        rcViewDataD = findViewById(R.id.rcViewDataD)
-        loader = findViewById(R.id.loader)
     }
 
 
     private fun initRcView2() {
-        rcViewDataD?.layoutManager =
+        binding.rcViewDataD?.layoutManager =
             LinearLayoutManager(this@DataDetailActivity) //настройка rcview по вертикали
-        rcViewDataD?.adapter = adapterDay
+        binding.rcViewDataD?.adapter = adapterDay
 
 
     }
@@ -95,13 +94,13 @@ class DataDetailActivity : AppCompatActivity() {
 
                 val updateList = parseS(result)
                 addList(updateList as ArrayList<Weather>)
-                loader.visibility = View.GONE
+                binding.loader.visibility = View.GONE
 
             },
             { error ->
 
                 Log.d("MyLog3", "Error: $error")
-                loader.visibility = View.VISIBLE
+                binding.loader.visibility = View.VISIBLE
                 Toast.makeText(this, "Отсутствие подключения к Интернету", Toast.LENGTH_SHORT)
                     .show()
 
@@ -150,9 +149,10 @@ class DataDetailActivity : AppCompatActivity() {
                 "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
 
 
+
             val item = Weather(
-                "${helpWeather.city.capitalize()}",
-                "${helpWeather.temp} °C",
+                "${helpCity.capitalize()}",
+                "${helpTemp} °C",
                 "${dayOfWeek.capitalize()}\n$time",
                 "$temp_min_max",
                 "$image2"

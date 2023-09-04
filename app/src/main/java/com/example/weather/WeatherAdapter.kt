@@ -7,9 +7,8 @@ import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 
 import androidx.recyclerview.widget.RecyclerView
+import com.example.weather.databinding.ListItemBinding
 
-
-lateinit var helpWeather: Weather
 
 var weatherList = mutableListOf<Weather>()
 
@@ -17,13 +16,12 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherHolder>() {
 
 
     class WeatherHolder(item: View) : RecyclerView.ViewHolder(item) {
-        val cityListAtem: TextView = item.findViewById(R.id.cityListAtem)
-        val tempListAtem: TextView = item.findViewById(R.id.tempListAtem)
 
-
-        fun bind(weather: Weather) {
+        val binding = ListItemBinding.bind(item)
+        fun bind(weather: Weather) = with (binding) {
             cityListAtem.text = weather.city
             tempListAtem.text = weather.temp
+
 
         }
 

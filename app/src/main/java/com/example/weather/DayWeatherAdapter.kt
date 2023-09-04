@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.weather.databinding.DataItemBinding
+import com.example.weather.databinding.ListItemBinding
 import com.squareup.picasso.Picasso
 
 
@@ -15,12 +17,10 @@ class DayWeatherAdapter() : RecyclerView.Adapter<DayWeatherAdapter.DayWeatherHol
 
 
     class DayWeatherHolder(item: View) : RecyclerView.ViewHolder(item) {
-        val day: TextView = item.findViewById(R.id.day)
-        val minMaxTemp: TextView = item.findViewById(R.id.minMaxTemp)
-        val dataItemImg: ImageView = item.findViewById(R.id.dataItemImg)
 
+        val binding = DataItemBinding.bind(item)
 
-        fun bind(weather: Weather) {
+        fun bind(weather: Weather) =with(binding) {
             day.text = weather.dayWeek
             minMaxTemp.text = weather.minMaxTemp
             Picasso.get().load(weather.imageurl).into(dataItemImg)

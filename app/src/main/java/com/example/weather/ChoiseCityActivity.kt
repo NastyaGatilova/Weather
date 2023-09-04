@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.weather.databinding.ActivityChoiseCityBinding
+import com.example.weather.databinding.ActivityMainBinding
 import com.example.weather.db.MyDbManager
 import org.json.JSONObject
 import kotlin.math.roundToInt
@@ -27,20 +29,21 @@ var cityPerem: String = ""
 var tempPerem: String = ""
 class ChoiseCityActivity : MainActivity() {
 
-    private var cityBtn: Button? = null
-    private var cityEditText: EditText? = null
+private lateinit var binding: ActivityChoiseCityBinding
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_choise_city)
+        binding = ActivityChoiseCityBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        initWidgets()
+        binding.cityEditText?.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
 
-        cityBtn?.setOnClickListener {
+        binding.cityBtn?.setOnClickListener {
 
-            cityPerem = cityEditText?.getText().toString().trim().toLowerCase()
+            cityPerem = binding.cityEditText?.getText().toString().trim().toLowerCase()
 
             if (cityPerem == "") Toast.makeText(this, "Введите название города!", Toast.LENGTH_SHORT).show()
             else{
@@ -54,12 +57,6 @@ class ChoiseCityActivity : MainActivity() {
 
     }
 
-
-    private fun initWidgets(){
-        cityBtn = findViewById(R.id.cityBtn)
-        cityEditText = findViewById(R.id.cityEditText)
-        cityEditText?.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-    }
 
 
     private fun request(city: String){
