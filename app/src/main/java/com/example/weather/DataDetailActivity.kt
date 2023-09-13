@@ -48,8 +48,8 @@ private lateinit var binding: ActivityDataDetailBinding
         helpTemp = intent.getStringExtra("temp").toString()
         helpImageurl = intent.getStringExtra("imageurl").toString()
 
-        binding.cityDataD?.text = helpCity
-        binding.tempDataD?.text = helpTemp
+        binding.cityDataD.text = helpCity
+        binding.tempDataD.text = helpTemp
         Picasso.get().load(helpImageurl).into(binding.imageurlDataD)
 
 
@@ -60,9 +60,9 @@ private lateinit var binding: ActivityDataDetailBinding
 
 
     private fun initRcView2() {
-        binding.rcViewDataD?.layoutManager =
+        binding.rcViewDataD.layoutManager =
             LinearLayoutManager(this@DataDetailActivity) //настройка rcview по вертикали
-        binding.rcViewDataD?.adapter = adapterDay
+        binding.rcViewDataD.adapter = adapterDay
 
 
     }

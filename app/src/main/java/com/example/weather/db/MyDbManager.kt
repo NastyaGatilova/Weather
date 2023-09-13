@@ -3,6 +3,7 @@ package com.example.weather.db
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.weather.Weather
@@ -112,6 +113,32 @@ class MyDbManager(context: Context) {
     fun deleteFromTable() {
         db?.execSQL("DELETE FROM ${MyDbClass.TABLE_NAME}")
     }
+    @SuppressLint("Range")
+    fun readDataWhereSity(cityDb: String):List<Pair<String, String>> {
+
+        val dataList = mutableListOf<Pair<String, String>>()
+        val cursor = db?.rawQuery(
+            "SELECT ${MyDbClass.COLUMN_NAME_TEMPER}, ${MyDbClass.COLUMN_NAME_IMGURL} FROM ${MyDbClass.TABLE_NAME} WHERE ${MyDbClass.COLUMN_NAME_CITY}= ?",
+            arrayOf(cityDb)
+        )
+
+        while (cursor?.moveToNext()!!) {
+            val temperature =
+                cursor.getFloat(cursor.getColumnIndex(MyDbClass.COLUMN_NAME_TEMPER)).toDouble()
+                    .roundToInt().toString()
+            val img = cursor?.getString(cursor.getColumnIndex(MyDbClass.COLUMN_NAME_IMGURL)).toString()
+
+            dataList.add(Pair(temperature, img))
+
+        }
+
+        cursor.close()
+        return dataList
+
+
+    }
+
+
 
     fun deleteCity(cityName: String) {
 

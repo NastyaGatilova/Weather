@@ -32,11 +32,11 @@ private lateinit var binding: ActivityChoiseCityBinding
         val view = binding.root
         setContentView(view)
 
-        binding.cityEditText?.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+        binding.cityEditText.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
 
-        binding.cityBtn?.setOnClickListener {
+        binding.cityBtn.setOnClickListener {
 
-            cityPerem = binding.cityEditText?.getText().toString().trim().toLowerCase()
+            cityPerem = binding.cityEditText.getText().toString().trim().toLowerCase()
 
             if (cityPerem == "") Toast.makeText(this, "Введите название города!", Toast.LENGTH_SHORT).show()
             else{
