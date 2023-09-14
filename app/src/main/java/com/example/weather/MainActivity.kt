@@ -54,7 +54,7 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
 
         val readCity = myDbManager.readTable()
 
-        if (savedInstanceState == null) {
+
                     if (readCity.isNotEmpty()) {
             for (item in readCity){
 
@@ -62,7 +62,7 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
 
             }
         }
-        }
+
 
 
         editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
