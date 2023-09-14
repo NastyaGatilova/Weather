@@ -2,6 +2,7 @@ package com.example.weather
 
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,42 +22,46 @@ class WeatherViewModel : ViewModel() {
 
     fun updateWeatherData(city: String, applicationContext: Context, myDbManager: MyDbManager) {
 
-        var tempDb = ""
-        var imgDb = ""
+        val readDb = myDbManager.readDbCurData()
 
-        val readData = myDbManager.readDataWhereSity(city)
-        for (item in readData){
-            tempDb = item.first
-            imgDb = item.second
-        }
+            var tempDb = ""
+            var imgDb = ""
+
+            val readData = myDbManager.readDataWhereSity(city)
+            for (item in readData) {
+                tempDb = item.first
+                imgDb = item.second
+            }
 
 
-        val url = "https://api.openweathermap.org/data/2.5/weather?" +
-                "q=$city" +
-                "&appid=${API_key}" +
-                "&units=metric"
-        var helpTemp = ""
-        var helpImg = ""
-        val queue = Volley.newRequestQueue(applicationContext)
-        val request = StringRequest(
-            Request.Method.GET,
-            url,
-            { result ->
-                helpTemp = parseTemp(result)
-                helpImg = parseImg(result)
+            val url = "https://api.openweathermap.org/data/2.5/weather?" +
+                    "q=$city" +
+                    "&appid=${API_key}" +
+                    "&units=metric"
+            var helpTemp = ""
+            var helpImg = ""
+            val queue = Volley.newRequestQueue(applicationContext)
+            val request = StringRequest(
+                Request.Method.GET,
+                url,
+                { result ->
+                   // Log.d("--Help--", "$result")
+                    helpTemp = parseTemp(result)
+                    helpImg = parseImg(result)
 
-                if ((helpTemp != tempDb) || (helpImg != imgDb))
-                myDbManager.updateTable(helpTemp, helpImg,  city)
+                    if ((helpTemp != tempDb) || (helpImg != imgDb)) {
+                        myDbManager.updateTable(helpTemp, helpImg, city)
 
-                val readDb = myDbManager.readDbCurData()
-                weatherList.clear()
-                weatherList.addAll(readDb)
-                weatherData.value = readDb
+                    }
 
-            },
-            { error -> }
-        )
-        queue.add(request)
+                    weatherData.value = readDb
+
+                },
+                { error -> }
+            )
+            queue.add(request)
+
+
     }
 
     private fun parseTemp(result: String) :String {

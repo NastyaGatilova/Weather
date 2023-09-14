@@ -18,7 +18,6 @@ import com.example.weather.databinding.ActivityMainBinding
 import com.example.weather.db.MyDbManager
 
 
-
 const val API_key = "1bb93494997fe83bb6d678b29f57d199"
 
 
@@ -32,6 +31,9 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
 
    private val viewModel by lazy {ViewModelProvider(this).get(WeatherViewModel::class.java)}
 
+
+
+
     @SuppressLint("SuspiciousIndentation", "MissingInflatedId", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,22 +41,27 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
         val view = binding.root
         setContentView(view)
 
-
         myDbManager.openDb()
 
         initRcView()
 
 
         viewModel.getWeatherData().observe(this, { newWeatherList ->
-            weatherAdapter.notifyDataSetChanged()
-
-        })
+            weatherList.clear()
+            weatherList.addAll(newWeatherList)
+           weatherAdapter.notifyDataSetChanged()
+ })
 
         val readCity = myDbManager.readTable()
-        if (readCity.isNotEmpty()) {
+
+        if (savedInstanceState == null) {
+                    if (readCity.isNotEmpty()) {
             for (item in readCity){
+
                 viewModel.updateWeatherData(item, this, myDbManager )
+
             }
+        }
         }
 
 
@@ -69,11 +76,10 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
 
 
 
-
     private fun initRcView() {
 
         binding.rcView.layoutManager =
-            LinearLayoutManager(this@MainActivity) //настройка rcview по вертикали
+            LinearLayoutManager(this@MainActivity)
         binding.rcView.adapter = weatherAdapter
         val itemClickListener = RecyclerViewItemClickListener(this, binding.rcView, this)
         binding.rcView.addOnItemTouchListener(itemClickListener)
