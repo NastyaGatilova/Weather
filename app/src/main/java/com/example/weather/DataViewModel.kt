@@ -1,10 +1,13 @@
 package com.example.weather
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +16,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.weather.databinding.ActivityDataDetailBinding
+import com.example.weather.db.MyDbManager
 import org.json.JSONObject
 import java.time.Instant
 import java.time.LocalDateTime
@@ -21,15 +25,25 @@ import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.roundToInt
 
+
 class DataViewModel: ViewModel() {
     private val listData = MutableLiveData<List<Weather>>()
+    private val listUpdateCity = MutableLiveData<List<Weather>>()
+    private var unixTimeLast:Long = 0
+    private var unixTimeNow:Long = 0
+
 
     fun getListData(): LiveData<List<Weather>> {
         return listData
     }
 
+    fun getlistUpdateCity(): LiveData<List<Weather>> {
+        return listUpdateCity
+    }
 
 
+
+///РАБОТА С DataDetailActivity
     @RequiresApi(Build.VERSION_CODES.O)
     fun requestList(city: String, temp:String, applicationContext: Context, binding: ActivityDataDetailBinding) {
 
@@ -61,7 +75,6 @@ class DataViewModel: ViewModel() {
         queue.add(request)
 
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun parseS(result: String, helpCity: String , helpTemp: String): List<Weather> {
@@ -107,6 +120,156 @@ class DataViewModel: ViewModel() {
         }
         return list
     }
+
+
+////РАБОТА С MainActivity
+
+
+    fun startDb(myDbManager: MyDbManager): MutableList<String> {
+
+        myDbManager.openDb()
+        val readCity = myDbManager.readTable()
+
+        return readCity
+    }
+
+    fun readListFromDb(myDbManager: MyDbManager): MutableList<Weather> {
+
+        myDbManager.openDb()
+        val readList = myDbManager.readDbCurData()
+
+        return readList
+    }
+
+
+
+
+
+     fun requestForUpdate(city: String, readCity: MutableList<String>, context: Context, sharedPreferences: SharedPreferences, myDbManager: MyDbManager, weatherAdapter: WeatherAdapter)   {
+
+        val url = "https://api.openweathermap.org/data/2.5/weather?" +
+                "q=$city" +
+                "&appid=${API_key}" +
+                "&units=metric"
+
+        val queue = Volley.newRequestQueue(context)
+        val request = StringRequest(
+            Request.Method.GET,
+            url,
+            { result ->
+
+                val lastUpdate = sharedPreferences.getLong("lastUpdate",0)
+                val readDb = myDbManager.readDbCurData()
+                unixTimeNow = parseLastUpdate(result).toLong()
+
+                if (unixTimeNow > lastUpdate){
+
+                    unixTimeLast = unixTimeNow
+
+                    val editor = sharedPreferences.edit()
+
+                    editor.putLong("lastUpdate", unixTimeLast)
+                    editor.apply()
+
+                    for (item in readCity) {
+                        request(item, context, myDbManager, weatherAdapter, readDb)
+                    }
+
+                }
+                else  {
+
+                    listUpdateCity.value=readDb
+
+
+                }
+
+            },
+            { error ->  }
+        )
+        queue.add(request)
+
+    }
+
+
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun request(city: String, applicationContext: Context, myDbManager: MyDbManager, weatherAdapter: WeatherAdapter, readDb:MutableList<Weather> )  {
+        val url = "https://api.openweathermap.org/data/2.5/weather?" +
+                "q=$city" +
+                "&appid=${API_key}" +
+                "&units=metric"
+        var helpTemp = ""
+        var helpImg = ""
+        val queue = Volley.newRequestQueue(applicationContext)
+        val request = StringRequest(
+            Request.Method.GET,
+            url,
+            { result ->
+
+                helpTemp = parseTemp(result)
+                helpImg = parseImg(result)
+                myDbManager.updateTable(helpTemp, helpImg,  city)
+                listUpdateCity.value=readDb
+
+                val handler = Handler(Looper.getMainLooper())
+
+                handler.post {
+                    weatherAdapter.notifyDataSetChanged()
+                    }
+            },
+            { error -> }
+        )
+        queue.add(request)
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun parseTemp(result: String) :String {
+
+        val mainObject = JSONObject(result)
+        val mainn = mainObject.getJSONObject("main")
+        val tempTec = mainn.getString("temp").toDouble().roundToInt().toString()
+
+        return tempTec
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun parseImg(result: String)  :String {
+
+        val mainObject = JSONObject(result)
+        val icon = mainObject.getJSONArray("weather").getJSONObject(0).getString("icon")
+        val image2 =
+            "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
+
+        return image2
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun parseLastUpdate(result: String)  :String {
+
+        val mainObject = JSONObject(result)
+        val dt = mainObject.getString("dt")
+
+        return dt
+
+    }
+
+//    private fun dateTranslation(unixTime: Long): String {
+//
+//
+//        val date = Date(unixTime * 1000L)
+//        val format = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+//        val formattedDate = format.format(date)
+//
+//        return formattedDate
+//
+//    }
+
+
+
+
 
 
 }

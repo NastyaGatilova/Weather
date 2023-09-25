@@ -114,7 +114,7 @@ class MyDbManager(context: Context) {
         db?.execSQL("DELETE FROM ${MyDbClass.TABLE_NAME}")
     }
     @SuppressLint("Range")
-    fun readDataWhereSity(cityDb: String):List<Pair<String, String>> {
+    fun readTempImg(cityDb: String):List<Pair<String, String>> {
 
         val dataList = mutableListOf<Pair<String, String>>()
         val cursor = db?.rawQuery(

@@ -29,15 +29,16 @@ class DataDetailActivity : AppCompatActivity() {
 
     private val viewModel by lazy { ViewModelProvider(this).get(DataViewModel::class.java)}
 
-    val adapterDay = DayWeatherAdapter()
+    private val adapterDay = DayWeatherAdapter()
 
     var helpCity = ""
     var helpTemp = ""
     var helpImageurl = ""
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint("MissingInflatedId", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDataDetailBinding.inflate(layoutInflater)
@@ -50,6 +51,8 @@ class DataDetailActivity : AppCompatActivity() {
         helpCity = intent.getStringExtra("city").toString()
         helpTemp = intent.getStringExtra("temp").toString()
         helpImageurl = intent.getStringExtra("imageurl").toString()
+
+
 
         binding.cityDataD.text = helpCity
         binding.tempDataD.text = helpTemp
