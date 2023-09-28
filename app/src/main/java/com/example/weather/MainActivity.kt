@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,7 +61,10 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
         if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
 
             if (readCity.isNotEmpty()) {
-                viewModel.requestForUpdate(readCity[0], readCity, this,sharedPreferences, myDbManager, weatherAdapter )
+
+                for (item in readCity) {
+                    viewModel.request(item, myDbManager, weatherAdapter, sharedPreferences)
+                }
             }
 
         } else {
@@ -82,9 +86,11 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
         viewModel.getlistUpdateCity().observe(this, { newWeatherList ->
             weatherList.clear()
             weatherList.addAll(newWeatherList)
-            weatherAdapter.notifyDataSetChanged()
+            runOnUiThread { weatherAdapter.notifyDataSetChanged() }
         })
+
     }
+
 
 
     private fun initRcView() {

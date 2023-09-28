@@ -1,6 +1,7 @@
 package com.example.weather
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
@@ -9,6 +10,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,19 +20,24 @@ import com.android.volley.toolbox.Volley
 import com.example.weather.databinding.ActivityDataDetailBinding
 import com.example.weather.db.MyDbManager
 import org.json.JSONObject
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.TextStyle
+import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 
-class DataViewModel: ViewModel() {
+class DataViewModel(application: Application): AndroidViewModel(application) {
     private val listData = MutableLiveData<List<Weather>>()
-    private val listUpdateCity = MutableLiveData<List<Weather>>()
+    val listUpdateCity = MutableLiveData<List<Weather>>()
     private var unixTimeLast:Long = 0
     private var unixTimeNow:Long = 0
+
+
 
 
     fun getListData(): LiveData<List<Weather>> {
@@ -144,84 +151,51 @@ class DataViewModel: ViewModel() {
 
 
 
-
-     fun requestForUpdate(city: String, readCity: MutableList<String>, context: Context, sharedPreferences: SharedPreferences, myDbManager: MyDbManager, weatherAdapter: WeatherAdapter)   {
-
-        val url = "https://api.openweathermap.org/data/2.5/weather?" +
-                "q=$city" +
-                "&appid=${API_key}" +
-                "&units=metric"
-
-        val queue = Volley.newRequestQueue(context)
-        val request = StringRequest(
-            Request.Method.GET,
-            url,
-            { result ->
-
-                val lastUpdate = sharedPreferences.getLong("lastUpdate",0)
-                val readDb = myDbManager.readDbCurData()
-                unixTimeNow = parseLastUpdate(result).toLong()
-
-                if (unixTimeNow > lastUpdate){
-
-                    unixTimeLast = unixTimeNow
-
-                    val editor = sharedPreferences.edit()
-
-                    editor.putLong("lastUpdate", unixTimeLast)
-                    editor.apply()
-
-                    for (item in readCity) {
-                        request(item, context, myDbManager, weatherAdapter, readDb)
-                    }
-
-                }
-                else  {
-
-                    listUpdateCity.value=readDb
-
-
-                }
-
-            },
-            { error ->  }
-        )
-        queue.add(request)
-
-    }
-
-
-
-
     @SuppressLint("NotifyDataSetChanged")
-    private fun request(city: String, applicationContext: Context, myDbManager: MyDbManager, weatherAdapter: WeatherAdapter, readDb:MutableList<Weather> )  {
+     fun request(city: String, myDbManager: MyDbManager, weatherAdapter: WeatherAdapter , sharedPreferences: SharedPreferences)  {
         val url = "https://api.openweathermap.org/data/2.5/weather?" +
                 "q=$city" +
                 "&appid=${API_key}" +
                 "&units=metric"
         var helpTemp = ""
         var helpImg = ""
-        val queue = Volley.newRequestQueue(applicationContext)
+
+        val queue = Volley.newRequestQueue(getApplication())
         val request = StringRequest(
             Request.Method.GET,
             url,
             { result ->
 
-                helpTemp = parseTemp(result)
-                helpImg = parseImg(result)
-                myDbManager.updateTable(helpTemp, helpImg,  city)
-                listUpdateCity.value=readDb
+                val lastUpdate = sharedPreferences.getLong("lastUpdate",0)
 
-                val handler = Handler(Looper.getMainLooper())
+                val readDb = myDbManager.readDbCurData()
+                unixTimeNow = parseLastUpdate(result).toLong()
 
-                handler.post {
-                    weatherAdapter.notifyDataSetChanged()
-                    }
+
+                val editor = sharedPreferences.edit()
+                if (unixTimeNow > lastUpdate) {
+
+                    unixTimeLast = unixTimeNow
+
+                    editor.putLong("lastUpdate", unixTimeLast)
+                    editor.apply()
+
+                    helpTemp = parseTemp(result)
+                    helpImg = parseImg(result)
+
+                    myDbManager.updateTable(helpTemp, helpImg, city)
+                }
+
+
+                listUpdateCity.value= readDb
+
+
             },
             { error -> }
         )
         queue.add(request)
     }
+
 
 
     @SuppressLint("NotifyDataSetChanged")
@@ -231,7 +205,10 @@ class DataViewModel: ViewModel() {
         val mainn = mainObject.getJSONObject("main")
         val tempTec = mainn.getString("temp").toDouble().roundToInt().toString()
 
+
         return tempTec
+
+
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -243,6 +220,7 @@ class DataViewModel: ViewModel() {
             "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
 
         return image2
+
 
     }
 
@@ -256,16 +234,18 @@ class DataViewModel: ViewModel() {
 
     }
 
-//    private fun dateTranslation(unixTime: Long): String {
-//
-//
-//        val date = Date(unixTime * 1000L)
-//        val format = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
-//        val formattedDate = format.format(date)
-//
-//        return formattedDate
-//
-//    }
+
+
+    private fun dateTranslation(unixTime: Long): String {
+
+
+        val date = Date(unixTime * 1000L)
+        val format = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+        val formattedDate = format.format(date)
+
+        return formattedDate
+
+    }
 
 
 
