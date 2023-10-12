@@ -108,6 +108,7 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
                 Log.d("--Help--", "Error!!!!")
+                listUpdateCity.value = readData
             }
         })
     }

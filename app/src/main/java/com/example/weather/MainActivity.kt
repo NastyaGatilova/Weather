@@ -3,12 +3,14 @@ package com.example.weather
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -46,6 +48,13 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
 
         initRcView()
 
+
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        val isConnected = networkInfo != null && networkInfo.isConnected
+        if (isConnected==false){
+            Toast.makeText(this, "Нет доступа к интернету!", Toast.LENGTH_SHORT).show()
+        }
 
 
 
