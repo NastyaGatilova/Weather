@@ -3,41 +3,38 @@ package com.example.weather
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weather.databinding.ActivityMainBinding
-import com.example.weather.db.MyDbManager
-
-
-
-const val API_key = "1bb93494997fe83bb6d678b29f57d199"
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Date
 
 
 open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnItemClickListener {
-   val myDbManager = MyDbManager(this)
+
 
     private val weatherAdapter = WeatherAdapter()
     private var editLauncher: ActivityResultLauncher<Intent>? = null
 
     private lateinit var binding: ActivityMainBinding
 
-    private val viewModel by lazy { ViewModelProvider(this).get(DataViewModel::class.java)}
+    val viewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java)}
 
     @RequiresApi(Build.VERSION_CODES.M)
     @SuppressLint("SuspiciousIndentation", "MissingInflatedId", "NotifyDataSetChanged")
@@ -46,33 +43,9 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        val sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+
         initRcView()
 
-
-        val readCity = viewModel.startDb(myDbManager )
-
-
-        val connectivityManager =
-            this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-
-        if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-
-            if (readCity.isNotEmpty()) {
-
-                for (item in readCity) {
-                    viewModel.request(item, myDbManager, weatherAdapter, sharedPreferences)
-                }
-            }
-
-        } else {
-            Toast.makeText(this, "Нет доступа к интернету!", Toast.LENGTH_SHORT).show()
-            weatherList.clear()
-            weatherList.addAll( viewModel.readListFromDb(myDbManager))
-            weatherAdapter.notifyDataSetChanged()
-        }
 
 
 
@@ -87,9 +60,13 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
             weatherList.clear()
             weatherList.addAll(newWeatherList)
             runOnUiThread { weatherAdapter.notifyDataSetChanged() }
+
+
         })
 
     }
+
+
 
 
 

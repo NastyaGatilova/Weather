@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.InputType
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -40,7 +41,7 @@ private lateinit var binding: ActivityChoiseCityBinding
 
             if (cityPerem == "") Toast.makeText(this, "Введите название города!", Toast.LENGTH_SHORT).show()
             else{
-                if (myDbManager.checkCityExists(cityPerem.capitalize())) Toast.makeText(this, "Такой город уже существует в списке!", Toast.LENGTH_SHORT).show()
+                if (viewModel.myDbManager.checkCityExists(cityPerem.capitalize())) Toast.makeText(this, "Такой город уже существует в списке!", Toast.LENGTH_SHORT).show()
                 else request(cityPerem)
             }
 
@@ -101,7 +102,7 @@ private lateinit var binding: ActivityChoiseCityBinding
             "$image2"
         )
 
-        myDbManager.insertToDbCurData(item)
+        viewModel.myDbManager.insertToDbCurData(item)
 
         val editIntent = Intent().apply{
             putExtra("weather", item)
@@ -119,7 +120,7 @@ private lateinit var binding: ActivityChoiseCityBinding
     override fun onBackPressed() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-        myDbManager.closeDb()
+        viewModel.myDbManager.closeDb()
         finish()
     }
 

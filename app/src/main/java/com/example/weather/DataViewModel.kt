@@ -33,9 +33,8 @@ import kotlin.random.Random
 
 class DataViewModel(application: Application): AndroidViewModel(application) {
     private val listData = MutableLiveData<List<Weather>>()
-    val listUpdateCity = MutableLiveData<List<Weather>>()
-    private var unixTimeLast:Long = 0
-    private var unixTimeNow:Long = 0
+
+
 
 
 
@@ -44,9 +43,7 @@ class DataViewModel(application: Application): AndroidViewModel(application) {
         return listData
     }
 
-    fun getlistUpdateCity(): LiveData<List<Weather>> {
-        return listUpdateCity
-    }
+
 
 
 
@@ -129,123 +126,6 @@ class DataViewModel(application: Application): AndroidViewModel(application) {
     }
 
 
-////РАБОТА С MainActivity
-
-
-    fun startDb(myDbManager: MyDbManager): MutableList<String> {
-
-        myDbManager.openDb()
-        val readCity = myDbManager.readTable()
-
-        return readCity
-    }
-
-    fun readListFromDb(myDbManager: MyDbManager): MutableList<Weather> {
-
-        myDbManager.openDb()
-        val readList = myDbManager.readDbCurData()
-
-        return readList
-    }
-
-
-
-
-    @SuppressLint("NotifyDataSetChanged")
-     fun request(city: String, myDbManager: MyDbManager, weatherAdapter: WeatherAdapter , sharedPreferences: SharedPreferences)  {
-        val url = "https://api.openweathermap.org/data/2.5/weather?" +
-                "q=$city" +
-                "&appid=${API_key}" +
-                "&units=metric"
-        var helpTemp = ""
-        var helpImg = ""
-
-        val queue = Volley.newRequestQueue(getApplication())
-        val request = StringRequest(
-            Request.Method.GET,
-            url,
-            { result ->
-
-                val lastUpdate = sharedPreferences.getLong("lastUpdate",0)
-
-                val readDb = myDbManager.readDbCurData()
-                unixTimeNow = parseLastUpdate(result).toLong()
-
-
-                val editor = sharedPreferences.edit()
-                if (unixTimeNow > lastUpdate) {
-
-                    unixTimeLast = unixTimeNow
-
-                    editor.putLong("lastUpdate", unixTimeLast)
-                    editor.apply()
-
-                    helpTemp = parseTemp(result)
-                    helpImg = parseImg(result)
-
-                    myDbManager.updateTable(helpTemp, helpImg, city)
-                }
-
-
-                listUpdateCity.value= readDb
-
-
-            },
-            { error -> }
-        )
-        queue.add(request)
-    }
-
-
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun parseTemp(result: String) :String {
-
-        val mainObject = JSONObject(result)
-        val mainn = mainObject.getJSONObject("main")
-        val tempTec = mainn.getString("temp").toDouble().roundToInt().toString()
-
-
-        return tempTec
-
-
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun parseImg(result: String)  :String {
-
-        val mainObject = JSONObject(result)
-        val icon = mainObject.getJSONArray("weather").getJSONObject(0).getString("icon")
-        val image2 =
-            "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
-
-        return image2
-
-
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun parseLastUpdate(result: String)  :String {
-
-        val mainObject = JSONObject(result)
-        val dt = mainObject.getString("dt")
-
-        return dt
-
-    }
-
-
-
-    private fun dateTranslation(unixTime: Long): String {
-
-
-        val date = Date(unixTime * 1000L)
-        val format = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
-        val formattedDate = format.format(date)
-
-        return formattedDate
-
-    }
 
 
 
