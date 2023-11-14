@@ -3,6 +3,7 @@ package com.example.weather
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
@@ -26,13 +27,13 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Date
+import java.util.Locale
 
 
 open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnItemClickListener {
 
 
     private val weatherAdapter = WeatherAdapter()
-    private var editLauncher: ActivityResultLauncher<Intent>? = null
 
     private lateinit var binding: ActivityMainBinding
 
@@ -46,6 +47,8 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
         val view = binding.root
         setContentView(view)
 
+
+
         initRcView()
 
 
@@ -53,29 +56,19 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
         val networkInfo = connectivityManager.activeNetworkInfo
         val isConnected = networkInfo != null && networkInfo.isConnected
         if (isConnected==false){
-            Toast.makeText(this, "Нет доступа к интернету!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.no_access, Toast.LENGTH_SHORT).show()
         }
 
 
-
-        editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) {
-                addCity(it.data?.getSerializableExtra("weather") as Weather)
-            }
-
-        }
 
         viewModel.getlistUpdateCity().observe(this, { newWeatherList ->
             weatherList.clear()
             weatherList.addAll(newWeatherList)
-            runOnUiThread { weatherAdapter.notifyDataSetChanged() }
-
+            weatherAdapter.notifyDataSetChanged()
 
         })
 
     }
-
-
 
 
 
@@ -94,20 +87,19 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
 
 
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun addCity(weather: Weather) {
-        weatherList.add(weather)
-        weatherAdapter.notifyDataSetChanged()
-    }
-
     fun newItemList(view: View?) {
 
-        editLauncher?.launch(Intent(this@MainActivity, ChoiseCityActivity::class.java))
+
+        val intent = Intent(this, ChoiseCityActivity::class.java)
+        startActivity(intent)
+
+
         finish()
 
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onItemClick(view: View, position: Int) {
 
         val intent = Intent(this, DataDetailActivity::class.java)

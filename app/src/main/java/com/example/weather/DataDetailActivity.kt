@@ -14,8 +14,13 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.weather.databinding.ActivityDataDetailBinding
+import com.example.weather.retrofit.ApiService
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -23,6 +28,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.roundToInt
 
+@RequiresApi(Build.VERSION_CODES.O)
 class DataDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDataDetailBinding
@@ -31,10 +37,10 @@ class DataDetailActivity : AppCompatActivity() {
 
     private val adapterDay = DayWeatherAdapter()
 
+
     var helpCity = ""
     var helpTemp = ""
     var helpImageurl = ""
-
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -66,7 +72,10 @@ class DataDetailActivity : AppCompatActivity() {
 
         })
 
-        viewModel.requestList(helpCity, helpTemp, this, binding)
+
+
+
+       viewModel.requestList(helpCity, helpTemp, this, binding)
 
 
     }

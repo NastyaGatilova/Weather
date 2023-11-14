@@ -39,9 +39,9 @@ private lateinit var binding: ActivityChoiseCityBinding
 
             cityPerem = binding.cityEditText.getText().toString().trim().toLowerCase()
 
-            if (cityPerem == "") Toast.makeText(this, "Введите название города!", Toast.LENGTH_SHORT).show()
+            if (cityPerem == "") Toast.makeText(this, R.string.enter_city, Toast.LENGTH_SHORT).show()
             else{
-                if (viewModel.myDbManager.checkCityExists(cityPerem.capitalize())) Toast.makeText(this, "Такой город уже существует в списке!", Toast.LENGTH_SHORT).show()
+                if (viewModel.myDbManager.checkCityExists(cityPerem.capitalize())) Toast.makeText(this, R.string.city_exists, Toast.LENGTH_SHORT).show()
                 else request(cityPerem)
             }
 
@@ -70,10 +70,10 @@ private lateinit var binding: ActivityChoiseCityBinding
             },
             {
                     error ->
-                if(error.toString() == "com.android.volley.ClientError" )    Toast.makeText(this, "Такого города не существует!", Toast.LENGTH_SHORT).show()
+                if(error.toString() == "com.android.volley.ClientError" )    Toast.makeText(this, R.string.no_city, Toast.LENGTH_SHORT).show()
                 else {
-                    Toast.makeText(this, "Отсутствие подключения к Интернету", Toast.LENGTH_SHORT).show()
-                    Toast.makeText(this, "Если проблема не решена: openweathermap.org/api", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, R.string.no_internet, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.if_problem, Toast.LENGTH_LONG).show()
                 }
 
 
@@ -103,11 +103,6 @@ private lateinit var binding: ActivityChoiseCityBinding
         )
 
         viewModel.myDbManager.insertToDbCurData(item)
-
-        val editIntent = Intent().apply{
-            putExtra("weather", item)
-        }
-        setResult(RESULT_OK, editIntent)
 
 
         val intent = Intent(this, MainActivity::class.java)

@@ -3,4 +3,10 @@
     <string name="hint_choise_city">Введите город</string>
     <string name="btn_choise_city">Добавить</string>
     <string name="btn_plus_main">+</string>
+    <string name="no_access">Нет доступа к интернету!</string>
+    <string name="enter_city">Введите название города!</string>
+    <string name="city_exists">Такой город уже существует в списке!</string>
+    <string name="no_city">Такого города не существует!</string>
+    <string name="no_internet">Отсутствие подключения к Интернету</string>
+    <string name="if_problem">Если проблема не решена: openweathermap.org/api</string>
 </resources>
