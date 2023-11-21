@@ -8,12 +8,11 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.weather.databinding.ActivityDataDetailBinding
-import com.example.weather.retrofit.DataWeatherResponse
 import com.example.weather.retrofit.WeatherResponse
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -26,12 +25,6 @@ import kotlin.math.roundToInt
 @RequiresApi(Build.VERSION_CODES.O)
 class DataViewModel(application: Application): MainViewModel(application) {
     private val listData = MutableLiveData<List<Weather>>()
-
-
-
-
-
-
     fun getListData(): LiveData<List<Weather>> {
         return listData
     }
@@ -42,41 +35,32 @@ class DataViewModel(application: Application): MainViewModel(application) {
 
 ///РАБОТА С DataDetailActivity
 
-
-    fun requestList(city: String, temp:String, applicationContext: Context, binding: ActivityDataDetailBinding) {
-
+    fun requestList(city: String, temp:String, applicationContext: Context, binding: ActivityDataDetailBinding)  = viewModelScope.launch{
 
 
-        val call2 = service.getDataWeather(city, "metric",API_key )
+    try {
+        val response2 = service.getDataWeather(city, "metric", API_key)
 
 
 
-        call2.enqueue(object : Callback<DataWeatherResponse> {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onResponse(
-                call2: Call<DataWeatherResponse>,
-                response2: Response<DataWeatherResponse>
-            ) {
-                if (response2.isSuccessful) {
-                    val updateList = parseS(response2.body()?.list, city, temp)
-                    listData.value = updateList
-                    binding.loader.visibility = View.GONE
+        if (response2.isSuccessful) {
+            val updateList = parseS(response2.body()?.list, city, temp)
+            listData.value = updateList
+            binding.loader.visibility = View.GONE
 
-                } else {
-                    Log.d("MyLog3", "Error: ${response2.code()}")
-                    binding.loader.visibility = View.VISIBLE
+        } else {
+            Log.d("MyLog3", "Error: ${response2.code()}")
+            binding.loader.visibility = View.VISIBLE
 
+        }
+
+    }catch (e:Exception){
+        Log.d("--Help--", "error")
+        binding.loader.visibility = View.VISIBLE
+            }
                 }
-            }
 
-            override fun onFailure(call: Call<DataWeatherResponse>, t: Throwable) {
-                Log.d("MyLog3", "Error: ${t.message}")
-                binding.loader.visibility = View.VISIBLE
 
-            }
-        })
-
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun parseS(list: List<WeatherResponse>?, helpCity: String, helpTemp: String): List<Weather> {

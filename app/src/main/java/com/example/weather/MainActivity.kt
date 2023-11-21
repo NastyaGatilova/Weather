@@ -3,17 +3,13 @@ package com.example.weather
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -21,13 +17,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weather.databinding.ActivityMainBinding
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.Date
-import java.util.Locale
+
 
 
 open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnItemClickListener {
@@ -39,6 +29,7 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
 
     val viewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java)}
 
+    var flagIsConected = true
     @RequiresApi(Build.VERSION_CODES.M)
     @SuppressLint("SuspiciousIndentation", "MissingInflatedId", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,19 +45,23 @@ open class MainActivity : AppCompatActivity(), RecyclerViewItemClickListener.OnI
 
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
-        val isConnected = networkInfo != null && networkInfo.isConnected
-        if (isConnected==false){
-            Toast.makeText(this, R.string.no_access, Toast.LENGTH_SHORT).show()
-        }
+        flagIsConected =  networkInfo != null && networkInfo.isConnected
+
+           if (flagIsConected==false){
+               Toast.makeText(this, R.string.no_access, Toast.LENGTH_SHORT).show()
+           }
 
 
 
-        viewModel.getlistUpdateCity().observe(this, { newWeatherList ->
+
+
+
+        viewModel.getlistUpdateCity().observe(this) { newWeatherList ->
             weatherList.clear()
             weatherList.addAll(newWeatherList)
             weatherAdapter.notifyDataSetChanged()
 
-        })
+        }
 
     }
 
