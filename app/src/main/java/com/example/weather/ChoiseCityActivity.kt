@@ -11,6 +11,7 @@ import com.example.weather.databinding.ActivityChoiseCityBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 
@@ -58,10 +59,10 @@ private lateinit var binding: ActivityChoiseCityBinding
     fun request(city: String) {
 
        CoroutineScope(Dispatchers.IO).launch {
-           val response = service.getWeather(city, API_key, "metric")
 
-           if (response.isSuccessful) {
-               val weather = response.body()
+
+           try {
+               val weather = service.getWeather(city, API_key, "metric")
                val tempTec = weather?.main?.temp?.roundToInt().toString()
                tempPerem = tempTec
 
@@ -78,7 +79,7 @@ private lateinit var binding: ActivityChoiseCityBinding
                    "${img}"
                )
 
-               runOnUiThread{viewModel.myDbManager.insertToDbCurData(item)}
+               withContext(Dispatchers.Main.immediate) {viewModel.myDbManager.insertToDbCurData(item)}
 
 
 
@@ -86,15 +87,16 @@ private lateinit var binding: ActivityChoiseCityBinding
                startActivity(intent)
                finish()
            }
-            else {
+           catch (e: Exception)  {
 
-               if (response.message().toString() == "Not Found")
-                   runOnUiThread{ Toast.makeText(this@ChoiseCityActivity, R.string.no_city, Toast.LENGTH_SHORT).show()}
-               else runOnUiThread {Toast.makeText(this@ChoiseCityActivity, R.string.if_problem, Toast.LENGTH_LONG).show()}
-           }
+
+               withContext(Dispatchers.Main.immediate){ Toast.makeText(this@ChoiseCityActivity, R.string.no_city, Toast.LENGTH_SHORT).show()
+                       Toast.makeText(this@ChoiseCityActivity, R.string.if_problem, Toast.LENGTH_LONG).show()
+                   }
+
 
        }
-            }
+            }}
 
 
 

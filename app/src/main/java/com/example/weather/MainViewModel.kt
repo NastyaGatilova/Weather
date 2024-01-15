@@ -1,6 +1,7 @@
 package com.example.weather
 
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.util.Log
@@ -12,7 +13,10 @@ import com.example.weather.db.MyDbManager
 import com.example.weather.retrofit.ApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.text.SimpleDateFormat
@@ -33,6 +37,7 @@ val retrofit = Retrofit.Builder()
     .build()
 val service = retrofit.create(ApiService::class.java)
 
+@SuppressLint("SuspiciousIndentation")
 open class MainViewModel(application: Application): AndroidViewModel(application) {
     val myDbManager = MyDbManager(application)
 
@@ -42,25 +47,37 @@ open class MainViewModel(application: Application): AndroidViewModel(application
 
     val listTempImg = mutableListOf<Weather>()
 
+
+
     init {
-        val readCity = startDb(myDbManager )
+        val readCity = startDb(myDbManager)
         val readData = myDbManager.readDbCurData()
 
         val nowTime = System.currentTimeMillis()
-        val lastTime = getTime()
-
+        val lastUpdateTime = getTime()
 
         if (readCity.isNotEmpty()) {
-            if (isUpdateNeeded( lastTime,nowTime )){
-                for (item in readCity) {
+
+
+            if (isUpdateNeeded(lastUpdateTime, nowTime)) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    for (item in readCity) {
                             request(item, myDbManager, readData, service)
+                        }
+
+                        saveTime()
+
+                    }}
+                    else {
+                listUpdateCity.value = readData
                 }
-                      }
-            else  listUpdateCity.value = readData
-        }
+                }
+            }
 
 
-    }
+
+
+
 
 
 
@@ -118,24 +135,15 @@ open class MainViewModel(application: Application): AndroidViewModel(application
         service: ApiService
     ) = viewModelScope.launch {
 
+        try{
 
-        try {
-
-
-                val response = service.getWeather(city, API_key, "metric")
-
-
-
-                if (response.isSuccessful) {
-                    val weather = response.body()
+                    val weather = service.getWeather(city, API_key, "metric")
                     val helpTemp = weather?.main?.temp?.roundToInt().toString()
 
                     val helpImg = weather?.weather?.get(0)?.icon?.let { icon ->
                         "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/$icon.png"
                     } ?: ""
 
-
-                    saveTime()
 
 
                     val item = Weather(
@@ -149,11 +157,10 @@ open class MainViewModel(application: Application): AndroidViewModel(application
                     listTempImg.add(item)
                     myDbManager.updateTable(helpTemp, helpImg, city)
                     listUpdateCity.value = listTempImg
-                    } else {
-                            listUpdateCity.value = readData
-                                }
+
                 }
                     catch (e: Exception) {
+                        listUpdateCity.value = readData
                         Log.d("--Help--", "ERROR!!!!")
                 }
 

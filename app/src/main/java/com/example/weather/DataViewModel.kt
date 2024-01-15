@@ -43,16 +43,12 @@ class DataViewModel(application: Application): MainViewModel(application) {
 
 
 
-        if (response2.isSuccessful) {
-            val updateList = parseS(response2.body()?.list, city, temp)
+
+            val updateList = parseS(response2?.list, city, temp)
             listData.value = updateList
             binding.loader.visibility = View.GONE
 
-        } else {
-            Log.d("MyLog3", "Error: ${response2.code()}")
-            binding.loader.visibility = View.VISIBLE
 
-        }
 
     }catch (e:Exception){
         Log.d("--Help--", "error")
