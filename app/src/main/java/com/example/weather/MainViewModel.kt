@@ -14,7 +14,9 @@ import com.example.weather.retrofit.ApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
@@ -56,27 +58,37 @@ open class MainViewModel(application: Application): AndroidViewModel(application
         val nowTime = System.currentTimeMillis()
         val lastUpdateTime = getTime()
 
+
+
         if (readCity.isNotEmpty()) {
 
 
             if (isUpdateNeeded(lastUpdateTime, nowTime)) {
-                CoroutineScope(Dispatchers.IO).launch {
+                viewModelScope.launch {
+                    val listCity = mutableListOf<Deferred<Weather?>>()
                     for (item in readCity) {
-                            request(item, myDbManager, readData, service)
+                        val itemCity: Deferred<Weather?> = async { request(item, myDbManager, readData, service) }
+                        if (itemCity != null) {
+                            listCity.add(itemCity)
                         }
 
-                        saveTime()
+                    }
 
-                    }}
-                    else {
-                listUpdateCity.value = readData
+                    for (element in listCity) {
+                        element.await()
+                    }
+
+                    saveTime()
+
+                   
                 }
+
+
+            }
+                    else listUpdateCity.value = readData
+
                 }
             }
-
-
-
-
 
 
 
@@ -130,10 +142,11 @@ open class MainViewModel(application: Application): AndroidViewModel(application
     }
 
 
-    fun request(
+    suspend fun request(
         city: String, myDbManager: MyDbManager, readData: MutableList<Weather>,
         service: ApiService
-    ) = viewModelScope.launch {
+    ): Weather?
+    {
 
         try{
 
@@ -158,13 +171,18 @@ open class MainViewModel(application: Application): AndroidViewModel(application
                     myDbManager.updateTable(helpTemp, helpImg, city)
                     listUpdateCity.value = listTempImg
 
+            return item
+
                 }
                     catch (e: Exception) {
                         listUpdateCity.value = readData
                         Log.d("--Help--", "ERROR!!!!")
+
+
+                        return null
                 }
 
-                }
+                  }
     }
 
 
